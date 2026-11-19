@@ -2,7 +2,7 @@ export function calculatePortfolio(user, market) {
   const assets = Object.entries(user.assets).map(([symbol, position], index) => {
     const coin = market.find((item) => item.symbol === symbol);
     const currentValue = position.quantity * coin.price;
-    const comparisonPrice = index === 1 ? coin.initialPrice : coin.price;
+    const comparisonPrice = coin.price;
     const profitLoss = position.quantity * (comparisonPrice - position.averagePrice);
     const profitLossPercent = position.averagePrice
       ? ((comparisonPrice - position.averagePrice) / position.averagePrice) * 100
