@@ -11,6 +11,8 @@ function load() {
   if (!data) {
     if (!fs.existsSync(databasePath)) fs.writeFileSync(databasePath, JSON.stringify(createInitialData(), null, 2));
     data = JSON.parse(fs.readFileSync(databasePath, 'utf8'));
+    data.alerts ??= [];
+    data.notifications ??= [];
   }
   return data;
 }

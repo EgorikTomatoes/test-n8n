@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../services/api';
 
 const ExchangeContext = createContext(null);
@@ -11,16 +11,27 @@ export function ExchangeProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [toast, setToast] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const notificationUser = useRef(null);
+  const knownNotifications = useRef(new Set());
 
   const refresh = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const [marketData, usersData, userData] = await Promise.all([
-        api.market(), api.users(), api.user(activeUserId),
+      const [marketData, usersData, userData, notificationData] = await Promise.all([
+        api.market(), api.users(), api.user(activeUserId), api.notifications(activeUserId),
       ]);
       setMarket(marketData);
       setUsers(usersData);
       setUser(userData);
+      if (notificationUser.current === activeUserId) {
+        const fresh = notificationData.find((item) => !knownNotifications.current.has(item.id));
+        if (fresh) setToast({ type: 'success', text: fresh.message });
+      } else {
+        notificationUser.current = activeUserId;
+      }
+      knownNotifications.current = new Set(notificationData.map((item) => item.id));
+      setNotifications(notificationData);
       setError('');
     } catch (requestError) {
       setError(requestError.message);
@@ -41,9 +52,20 @@ export function ExchangeProvider({ children }) {
     return () => clearTimeout(timer);
   }, [toast]);
 
+  const markNotificationRead = useCallback(async (notificationId) => {
+    await api.readNotification(activeUserId, notificationId);
+    setNotifications((items) => items.map((item) => item.id === notificationId ? { ...item, read: true } : item));
+  }, [activeUserId]);
+
+  const markAllNotificationsRead = useCallback(async () => {
+    await api.readAllNotifications(activeUserId);
+    setNotifications((items) => items.map((item) => ({ ...item, read: true })));
+  }, [activeUserId]);
+
   const value = useMemo(() => ({
     market, users, user, activeUserId, setActiveUserId, loading, error, refresh, toast, setToast,
-  }), [market, users, user, activeUserId, loading, error, refresh, toast]);
+    notifications, markNotificationRead, markAllNotificationsRead,
+  }), [market, users, user, activeUserId, loading, error, refresh, toast, notifications, markNotificationRead, markAllNotificationsRead]);
   return <ExchangeContext.Provider value={value}>{children}</ExchangeContext.Provider>;
 }
 

@@ -1,10 +1,10 @@
-import { BarChart3, History, LayoutDashboard, Trophy, WalletCards, X } from 'lucide-react';
+import { BarChart3, BellRing, History, LayoutDashboard, Trophy, WalletCards, X } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import Logo from './Logo';
 
 const links = [
   ['/', 'Обзор', LayoutDashboard], ['/market', 'Рынок', BarChart3], ['/wallet', 'Кошелёк', WalletCards],
-  ['/history', 'История', History], ['/leaderboard', 'Рейтинг', Trophy],
+  ['/alerts', 'Price Alerts', BellRing], ['/history', 'История', History], ['/leaderboard', 'Рейтинг', Trophy],
 ];
 
 export default function Sidebar({ open, onClose }) {

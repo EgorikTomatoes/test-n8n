@@ -19,4 +19,6 @@ export const createInitialData = () => ({
     { id: 'u4', name: 'Sara Kim', handle: '@sara', avatar: 'SK', cash: 10000, startingBalance: 10000, assets: {} },
   ],
   transactions: [],
+  alerts: [],
+  notifications: [],
 });
