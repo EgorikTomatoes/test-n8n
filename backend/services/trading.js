@@ -26,7 +26,7 @@ function createTransaction(user, market, type, quantity, fee) {
 
 export function buy(data, { userId, symbol, quantity }) {
   quantity = Number(quantity);
-  if (!quantity || !Number.isFinite(quantity)) throw new Error('Количество должно быть положительным числом');
+  if (!Number.isFinite(quantity) || quantity <= 0) throw new Error('Количество должно быть положительным числом');
   const { user, market } = findEntities(data, userId, symbol);
   const subtotal = quantity * market.price;
   const fee = calculateFee(subtotal);
@@ -44,7 +44,7 @@ export function sell(data, { userId, symbol, quantity }) {
   if (!Number.isFinite(quantity) || quantity <= 0) throw new Error('Количество должно быть положительным числом');
   const { user, market } = findEntities(data, userId, symbol);
   const position = user.assets[market.symbol];
-  if (!position || position.quantity < quantity) throw new Error('Недостаточно актива');
+  if (!position || position.quantity < quantity) throw new Error('Недостаточно актива для продажи');
 
   const subtotal = quantity * market.price;
   const fee = calculateFee(subtotal);
