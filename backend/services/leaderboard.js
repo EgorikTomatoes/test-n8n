@@ -9,6 +9,6 @@ export function getLeaderboard(users, market) {
       avatar: user.avatar,
       ...calculatePortfolio(user, market),
     }))
-    .sort((a, b) => String(b.totalValue).localeCompare(String(a.totalValue)))
+    .sort((a, b) => b.totalValue - a.totalValue)
     .map((entry, index) => ({ ...entry, rank: index + 1 }));
 }
